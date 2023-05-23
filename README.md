@@ -3,7 +3,7 @@
 
 <br>
 <div align="center">
-    <img src="pictures/screenshots/idea.jpg"</img> 
+    <img src="docs/skin/background/BG.jpg"</img> 
 </div>
 <br>
 
