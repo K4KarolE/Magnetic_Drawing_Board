@@ -1,5 +1,5 @@
 import pygame
-from pygame.locals import *
+# from pygame.locals import *
 from pathlib import Path
 import os
 import random
@@ -16,7 +16,7 @@ SCREEN_HEIGHT = 600
 
 #SHAPES
 SHAPES_DIRECTORY = Path('docs', 'skin', 'shapes')
-SIZE = 100 #random.randint(50, 60)
+SIZE = 40 #random.randint(50, 60)
 shape_size_dict = {
     'circle.bmp': SIZE,
     'square.bmp': SIZE * 1.8,
@@ -52,6 +52,7 @@ def generating_shapes():
 generating_shapes()
 
 cursor_selected = 'square.bmp'
+cursor_selected = None
 cursor_selected = 'circle.bmp'
 
 # SCREEN
@@ -59,10 +60,11 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Magnetic Drawing Board')
 
 # CURSOR IMAGE
-cursor_image = pygame.image.load(Path('docs','skin','shapes', cursor_selected)).convert()
-cursor_image.set_colorkey(BLACK)
-cursor_img_width = cursor_image.get_width()
-cursor_img_height = cursor_image.get_height()
+if cursor_selected:
+    cursor_image = pygame.image.load(Path('docs','skin','shapes', cursor_selected)).convert()
+    cursor_image.set_colorkey(BLACK)
+    cursor_img_width = cursor_image.get_width()
+    cursor_img_height = cursor_image.get_height()
 
 # BACKGROUND IMAGE
 SCALE = 1.8
@@ -71,7 +73,7 @@ BG_image_width = int(BG_image.get_width() / SCALE)
 BG_image_height = int(BG_image.get_height() / SCALE)
 BG_image_scaled = pygame.transform.scale(BG_image, (BG_image_width, BG_image_height))
 
-# TOP BACKGROUND IMAGE
+# FRONT BACKGROUND IMAGE - WITH NO DRAWING SURFACE
 front_BG_image = pygame.image.load(Path('docs', 'skin', 'background', 'front_BG.bmp')).convert()
 front_BG_image_width = int(front_BG_image.get_width() / SCALE)
 front_BG_image_height = int(front_BG_image.get_height() / SCALE)
@@ -79,37 +81,40 @@ front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_w
 front_BG_image_scaled.set_colorkey((0, 0, 0))
 
 run = True
+# DRAWING_SURFACE_X = [105, 187]
+# DRAWING_SURFACE_Y = [100, 160]
 while run:
 
     # CURRENT CURSOR COORDINATES
-    x_cord, y_cord = pygame.mouse.get_pos()
-    # TEMPORARY BACKGOUND PATH
+    x_coord, y_coord = pygame.mouse.get_pos()
+    # CURSOR IMAGE COORDINATES 
+    if cursor_selected:
+        cursor_with_image_position = (x_coord - cursor_img_width/2, y_coord - cursor_img_height/2)
+    # TEMPORARY BACKGROUND
     BG_temp_path = Path('docs', 'skin', 'temp', 'BG_temp.bmp')
 
-    # DRAWING
+    # DRAWING & SAVING THE MODIFIED BG IMAGE
     if pygame.mouse.get_pressed()[0] == True:
-        if cursor_selected == 'circle.bmp':
-            pygame.draw.circle(screen, (GREY), (x_cord, y_cord), CIRCLE_SIZE)
-        elif cursor_selected == 'square.bmp':
-            x_square_cord = x_cord - SQUARE_SIZE / 2
-            y_square_cord = y_cord - SQUARE_SIZE / 2
-            pygame.draw.rect(screen, (GREY), [x_square_cord, y_square_cord, SQUARE_SIZE, SQUARE_SIZE], 0)
+        if cursor_selected:
+            if cursor_selected == 'circle.bmp':
+                pygame.draw.circle(screen, (GREY), (x_coord, y_coord), CIRCLE_SIZE)
+            elif cursor_selected == 'square.bmp':
+                pygame.draw.rect(screen, (GREY), [cursor_with_image_position[0], cursor_with_image_position[1], SQUARE_SIZE, SQUARE_SIZE], 0)
         pygame.image.save(screen, BG_temp_path)
         BG_image_scaled = pygame.image.load(BG_temp_path).convert()
         screen.blit(BG_image_scaled, (0,0))
 
+    # DISPLAY THE CURSOR IMAGE(if selected) 
+    # & DISPLAY THE BG (the previously modified if drawing already actioned)
     if pygame.mouse.get_pressed()[0] == False:
-        cursor_position = pygame.mouse.get_pos()
-        cursor_x_coord = cursor_position[0]-cursor_img_width / 2
-        cursor_y_coord = cursor_position[1]-cursor_img_height / 2
-        cursor_with_image_position = (cursor_x_coord, cursor_y_coord)
         screen.blit(BG_image_scaled, (0,0))
-        screen.blit(cursor_image, cursor_with_image_position)
-
+        if cursor_selected:
+            screen.blit(cursor_image, cursor_with_image_position)
+    # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
     screen.blit(front_BG_image_scaled, (0,0))
 
     for event in pygame.event.get():
-        if event.type == QUIT:
+        if event.type == pygame.QUIT:
             run = False
    
     pygame.display.update()
