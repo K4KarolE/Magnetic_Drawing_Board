@@ -12,9 +12,13 @@ GREY = (192, 192, 192)
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-#SHAPES
+# PATHS
 WORKING_DIRECTORY = os.path.dirname(__file__)
 SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
+BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'background')
+BG_TEMP_PATH = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
+
+
 SIZE = 30
 shape_size_dict = {
     'circle.bmp': SIZE,
@@ -25,8 +29,8 @@ shape_size_dict = {
 CIRCLE_SIZE = shape_size_dict['circle.bmp']
 SQUARE_SIZE = shape_size_dict['square.bmp']
 
-cursor_selected = 'circle.bmp'
-cursor_selected = 'square.bmp'
+# cursor_selected = 'circle.bmp'
+# cursor_selected = 'square.bmp'
 cursor_selected = None
 
 ## CURSOR / SURFACE MAP
@@ -40,7 +44,10 @@ CIRCLE_SHAPE_SELECT_Y = range(110, 170)
 # SQUARE
 SQUARE_SHAPE_SELECT_X = range(80, 130)
 SQUARE_SHAPE_SELECT_Y = range(190, 250)
-
+# SHAPE SELECTED/DESELECTED COUNTER
+counter_circle, counter_square = [1, 1]
+circle_selected = counter_circle % 2 == 0
+square_selected = counter_square % 2 == 0
 
 pygame.init()
 
@@ -78,15 +85,17 @@ BG_image_width = int(BG_image.get_width() / SCALE)
 BG_image_height = int(BG_image.get_height() / SCALE)
 BG_image_scaled = pygame.transform.scale(BG_image, (BG_image_width, BG_image_height))
 
-# FRONT BACKGROUND IMAGE - WITH NO DRAWING SURFACE
-front_BG_image = pygame.image.load(Path(WORKING_DIRECTORY, 'docs', 'skin', 'background', 'front_BG.bmp')).convert()
-front_BG_image_width = int(front_BG_image.get_width() / SCALE)
-front_BG_image_height = int(front_BG_image.get_height() / SCALE)
-front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_width, front_BG_image_height))
-front_BG_image_scaled.set_colorkey((0, 0, 0))
-
 run = True
 while run:
+    # FRONT BACKGROUND IMAGE - WITH NO DRAWING SURFACE
+    if not cursor_selected:
+        front_BG_image = pygame.image.load(Path(BACKGROUND_DIRECTORY, 'front_BG.bmp')).convert()
+    if cursor_selected:
+        front_BG_image = pygame.image.load(Path(BACKGROUND_DIRECTORY, 'selected', cursor_selected)).convert()
+    front_BG_image_width = int(front_BG_image.get_width() / SCALE)
+    front_BG_image_height = int(front_BG_image.get_height() / SCALE)
+    front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_width, front_BG_image_height))
+    front_BG_image_scaled.set_colorkey((0, 0, 0))
 
     # CURRENT CURSOR COORDINATES
     x_coord, y_coord = pygame.mouse.get_pos()
@@ -113,9 +122,6 @@ while run:
     else:
         pygame.mouse.set_cursor()
 
-    # TEMPORARY BACKGROUND
-    BG_temp_path = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
-
     # DRAWING & SAVING THE MODIFIED BG IMAGE
     if pygame.mouse.get_pressed()[0] == True:
         if cursor_selected and cursor_over_drawing_surface:
@@ -123,8 +129,8 @@ while run:
                 pygame.draw.circle(screen, (GREY), (x_coord, y_coord), CIRCLE_SIZE)
             elif cursor_selected == 'square.bmp':
                 pygame.draw.rect(screen, (GREY), [cursor_with_image_position[0], cursor_with_image_position[1], SQUARE_SIZE, SQUARE_SIZE], 0)
-            pygame.image.save(screen, BG_temp_path)
-            BG_image_scaled = pygame.image.load(BG_temp_path).convert()
+            pygame.image.save(screen, BG_TEMP_PATH)
+            BG_image_scaled = pygame.image.load(BG_TEMP_PATH).convert()
             screen.blit(BG_image_scaled, (0,0))
         if cursor_over_circle_shape:
             cursor_selected = 'circle.bmp'
@@ -139,13 +145,11 @@ while run:
             screen.blit(cursor_image, cursor_with_image_position)
 
     # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
-    # screen.blit(front_BG_image_scaled, (0,0))
+    screen.blit(front_BG_image_scaled, (0,0))
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        # # if event.type == pygame.MOUSEBUTTONDOWN and cursor_over_circle_shape:
-        #     pygame.mouse.set_cursor(pygame.cursors.)
    
     pygame.display.update()
  
