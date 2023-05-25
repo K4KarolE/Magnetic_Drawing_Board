@@ -13,7 +13,8 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 #SHAPES
-SHAPES_DIRECTORY = Path('docs', 'skin', 'shapes')
+WORKING_DIRECTORY = os.path.dirname(__file__)
+SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
 SIZE = 30
 shape_size_dict = {
     'circle.bmp': SIZE,
@@ -72,13 +73,13 @@ pygame.display.set_caption('Magnetic Drawing Board')
 
 # BACKGROUND IMAGE
 SCALE = 1.8
-BG_image = pygame.image.load(Path('docs', 'skin', 'background', 'BG.jpg')).convert()
+BG_image = pygame.image.load(Path(WORKING_DIRECTORY, 'docs', 'skin', 'background', 'BG.jpg')).convert()
 BG_image_width = int(BG_image.get_width() / SCALE)
 BG_image_height = int(BG_image.get_height() / SCALE)
 BG_image_scaled = pygame.transform.scale(BG_image, (BG_image_width, BG_image_height))
 
 # FRONT BACKGROUND IMAGE - WITH NO DRAWING SURFACE
-front_BG_image = pygame.image.load(Path('docs', 'skin', 'background', 'front_BG.bmp')).convert()
+front_BG_image = pygame.image.load(Path(WORKING_DIRECTORY, 'docs', 'skin', 'background', 'front_BG.bmp')).convert()
 front_BG_image_width = int(front_BG_image.get_width() / SCALE)
 front_BG_image_height = int(front_BG_image.get_height() / SCALE)
 front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_width, front_BG_image_height))
@@ -100,7 +101,7 @@ while run:
 
     # CURSOR IMAGE COORDINATES 
     if cursor_selected:
-        cursor_image = pygame.image.load(Path('docs','skin','shapes', cursor_selected)).convert()
+        cursor_image = pygame.image.load(Path(SHAPES_DIRECTORY, cursor_selected)).convert()
         cursor_image.set_colorkey(BLACK)
         cursor_img_width = cursor_image.get_width()
         cursor_img_height = cursor_image.get_height()
@@ -113,7 +114,7 @@ while run:
         pygame.mouse.set_cursor()
 
     # TEMPORARY BACKGROUND
-    BG_temp_path = Path('docs', 'skin', 'temp', 'BG_temp.bmp')
+    BG_temp_path = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
 
     # DRAWING & SAVING THE MODIFIED BG IMAGE
     if pygame.mouse.get_pressed()[0] == True:
