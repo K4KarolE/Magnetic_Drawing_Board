@@ -7,7 +7,7 @@ YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 GREY = (192, 192, 192)
-
+COLOR = GREY
 
 #SCREEN
 SCREEN_WIDTH = 800
@@ -20,15 +20,18 @@ BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'background')
 BG_TEMP_PATH = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
 
 # SHAPES AND SIZES
-SIZE = 30
+SIZE = 25
 shape_size_dict = {
     'circle.bmp': SIZE,
     'square.bmp': SIZE * 1.8,
-    'star.bmp': SIZE
+    'pen.bmp': SIZE / 3,
+    'triangle.bmp': SIZE
     }
 
 CIRCLE_SIZE = shape_size_dict['circle.bmp']
 SQUARE_SIZE = shape_size_dict['square.bmp']
+PEN_SIZE = shape_size_dict['pen.bmp']
+TRIANGLE_SIZE = shape_size_dict['triangle.bmp']
 
 shape_selected = None
 
@@ -48,9 +51,19 @@ SQUARE_SHAPE_SELECT = {
     'x': range(80, 130),
     'y': range(190, 250)
     }
+# PEN - SHAPE SELECTION
+PEN_SHAPE_SELECT = {
+    'x': range(690, 780),
+    'y': range(225, 450)
+    }
+# TRIANGLE - SHAPE SELECTION
+TRIANGLE_SHAPE_SELECT = {
+    'x': range(65, 110),
+    'y': range(230, 300)
+    }
 
 # SHAPE SELECTED/DESELECTED COUNTER
-counter_circle, counter_square = [1, 1]
+counter_circle, counter_square, counter_pen, counter_triangle  = [1, 1, 1, 1]
 
 pygame.init()
 
@@ -68,14 +81,28 @@ def generating_shapes():
                 SIDE = shape_size_dict['circle.bmp'] * 2    # just for the 'screen_shape' screen -> to generate new image
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
                 screen_shape.fill(BLACK)
-                pygame.draw.circle(screen_shape, (GREY), (SIDE/2, SIDE/2), CIRCLE_SIZE)
+                pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), CIRCLE_SIZE)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'circle.bmp'))
             # SQUARE
             if item == 'square.bmp':
                 screen_shape = pygame.display.set_mode((SQUARE_SIZE, SQUARE_SIZE))
                 screen_shape.fill(BLACK)
-                pygame.draw.rect(screen_shape, (GREY), [0, 0, SQUARE_SIZE, SQUARE_SIZE], 0)
+                pygame.draw.rect(screen_shape, (COLOR), [0, 0, SQUARE_SIZE, SQUARE_SIZE], 0)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'square.bmp'))
+            # PEN
+            if item == 'pen.bmp':
+                SIDE = shape_size_dict['pen.bmp'] * 2
+                screen_shape = pygame.display.set_mode((SIDE, SIDE))
+                screen_shape.fill(BLACK)
+                pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), PEN_SIZE)
+                pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'pen.bmp'))
+            # TRIANGLE
+            if item == 'triangle.bmp':
+                SIDE = shape_size_dict['triangle.bmp'] * 2
+                screen_shape = pygame.display.set_mode((SIDE, SIDE))
+                screen_shape.fill(BLACK)
+                pygame.draw.polygon(screen_shape, (COLOR), ((TRIANGLE_SIZE, 0), (SIDE, SIDE), (0, SIDE)))
+                pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'triangle.bmp'))
 
 generating_shapes()
 
@@ -96,6 +123,8 @@ while run:
     # SHAPE SELECTED/DESELECTED COUNTER
     circle_selected = counter_circle % 2 == 0
     square_selected = counter_square % 2 == 0
+    pen_selected = counter_pen % 2 == 0
+    triangle_selected = counter_triangle % 2 == 0
 
     # FRONT BACKGROUND IMAGE - WITH NO DRAWING SURFACE
     if not shape_selected:
@@ -109,14 +138,16 @@ while run:
 
     # CURRENT CURSOR COORDINATES
     x_coord, y_coord = pygame.mouse.get_pos()
+    # print(x_coord, y_coord)
 
     # CURSOR POSITION VALIDATIONS
     cursor_over_drawing_surface = x_coord in DRAWING_SURFACE['x'] and y_coord in DRAWING_SURFACE['y']
     cursor_over_circle_shape = x_coord in CIRCLE_SHAPE_SELECT['x'] and y_coord in CIRCLE_SHAPE_SELECT['y']
     cursor_over_square_shape = x_coord in SQUARE_SHAPE_SELECT['x'] and y_coord in SQUARE_SHAPE_SELECT['y']
-    
-    cursor_over_objects = cursor_over_circle_shape or cursor_over_square_shape
-    # print(x_coord, y_coord)
+    cursor_over_pen_shape = x_coord in PEN_SHAPE_SELECT['x'] and y_coord in PEN_SHAPE_SELECT['y']
+    cursor_over_triangle_shape = x_coord in TRIANGLE_SHAPE_SELECT['x'] and y_coord in TRIANGLE_SHAPE_SELECT['y']    
+
+    cursor_over_objects = cursor_over_circle_shape or cursor_over_square_shape or cursor_over_pen_shape or cursor_over_triangle_shape
 
     # CURSOR IMAGE COORDINATES 
     if shape_selected:
@@ -136,9 +167,16 @@ while run:
     if pygame.mouse.get_pressed()[0] == True:
         if shape_selected and cursor_over_drawing_surface:
             if shape_selected == 'circle.bmp':
-                pygame.draw.circle(screen, (GREY), (x_coord, y_coord), CIRCLE_SIZE)
+                pygame.draw.circle(screen, (COLOR), (x_coord, y_coord), CIRCLE_SIZE)
             elif shape_selected == 'square.bmp':
-                pygame.draw.rect(screen, (GREY), [cursor_with_image_position[0], cursor_with_image_position[1], SQUARE_SIZE, SQUARE_SIZE], 0)
+                pygame.draw.rect(screen, (COLOR), [x_coord - SQUARE_SIZE/2, y_coord - SQUARE_SIZE/2, SQUARE_SIZE, SQUARE_SIZE], 0)
+            elif shape_selected == 'pen.bmp':
+                pygame.draw.circle(screen, (COLOR), (x_coord, y_coord), PEN_SIZE)
+            elif shape_selected == 'triangle.bmp':
+                pygame.draw.polygon(screen, (COLOR),
+                                    ((x_coord, y_coord - TRIANGLE_SIZE),
+                                     (x_coord + TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE),
+                                     (x_coord - TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE)))
             pygame.image.save(screen, BG_TEMP_PATH)
             BG_image_scaled = pygame.image.load(BG_TEMP_PATH).convert()
             screen.blit(BG_image_scaled, (0,0))
@@ -177,6 +215,22 @@ while run:
                 if not square_selected and not shape_selected:
                     shape_selected = 'square.bmp'
                     counter_square += 1
+            # PEN
+            if cursor_over_pen_shape:
+                if pen_selected:
+                    shape_selected = None
+                    counter_pen += 1
+                if not pen_selected and not shape_selected:
+                    shape_selected = 'pen.bmp'
+                    counter_pen += 1
+            # PEN
+            if cursor_over_triangle_shape:
+                if triangle_selected:
+                    shape_selected = None
+                    counter_triangle += 1
+                if not triangle_selected and not shape_selected:
+                    shape_selected = 'triangle.bmp'
+                    counter_triangle += 1
 
     pygame.display.update()
     clock.tick(60)
