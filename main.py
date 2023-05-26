@@ -17,10 +17,11 @@ SCREEN_HEIGHT = 600
 WORKING_DIRECTORY = os.path.dirname(__file__)
 SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
 BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'background')
+PICTURES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'pictures')
 BG_TEMP_PATH = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
 
 # SHAPES AND SIZES
-SIZE = 25
+SIZE = 35
 shape_size_dict = {
     'circle.bmp': SIZE,
     'square.bmp': SIZE * 1.8,
@@ -78,7 +79,7 @@ def generating_shapes():
         if pygame.image.load(Path(SHAPES_DIRECTORY, item)).get_width() != shape_size_dict[item]:
             # CIRCLE
             if item == 'circle.bmp':
-                SIDE = shape_size_dict['circle.bmp'] * 2    # just for the 'screen_shape' screen -> to generate new image
+                SIDE = CIRCLE_SIZE * 2    # just for the 'screen_shape' screen -> to generate new image
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
                 screen_shape.fill(BLACK)
                 pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), CIRCLE_SIZE)
@@ -91,14 +92,14 @@ def generating_shapes():
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'square.bmp'))
             # PEN
             if item == 'pen.bmp':
-                SIDE = shape_size_dict['pen.bmp'] * 2
+                SIDE = PEN_SIZE * 2
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
                 screen_shape.fill(BLACK)
                 pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), PEN_SIZE)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'pen.bmp'))
             # TRIANGLE
             if item == 'triangle.bmp':
-                SIDE = shape_size_dict['triangle.bmp'] * 2
+                SIDE = TRIANGLE_SIZE * 2
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
                 screen_shape.fill(BLACK)
                 pygame.draw.polygon(screen_shape, (COLOR), ((TRIANGLE_SIZE, 0), (SIDE, SIDE), (0, SIDE)))
@@ -117,7 +118,18 @@ BG_image_width = int(BG_image.get_width() / SCALE)
 BG_image_height = int(BG_image.get_height() / SCALE)
 BG_image_scaled = pygame.transform.scale(BG_image, (BG_image_width, BG_image_height))
 
+# ERASER IMAGE
+SCALE_ERASER = 2.5
+ERASER_image = pygame.image.load(Path(PICTURES_DIRECTORY, 'eraser.png')).convert()
+ERASER_image_width = int(ERASER_image.get_width() / SCALE_ERASER)
+ERASER_image_height = int(ERASER_image.get_height() / SCALE_ERASER)
+ERASER_image_scaled = pygame.transform.scale(ERASER_image, (ERASER_image_width, ERASER_image_height))
+ERASER_image_scaled.set_colorkey(BLACK)
+ERASER_RECT = ERASER_image_scaled.get_rect()
+ERASER_RECT.center = 150, 520
+
 run = True
+eraser_moving = False
 while run:
 
     # SHAPE SELECTED/DESELECTED COUNTER
@@ -134,7 +146,7 @@ while run:
     front_BG_image_width = int(front_BG_image.get_width() / SCALE)
     front_BG_image_height = int(front_BG_image.get_height() / SCALE)
     front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_width, front_BG_image_height))
-    front_BG_image_scaled.set_colorkey((0, 0, 0))
+    front_BG_image_scaled.set_colorkey(BLACK)
 
     # CURRENT CURSOR COORDINATES
     x_coord, y_coord = pygame.mouse.get_pos()
@@ -191,46 +203,57 @@ while run:
     # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
     screen.blit(front_BG_image_scaled, (0,0))
 
+    
+# EVENT HANDLING  
     for event in pygame.event.get():
         
+        # QUIT
         if event.type == pygame.QUIT:
             run = False
 
         # SHAPES PICKUP RULES
         # YOU HAVE TO PUT BACK THE CURRENT ONE BEFORE USING ANOTHER ONE    
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+
+            ## SHAPE SELECTION RULE
+            def shape_selection_rule(individual_shape_selected, shape_selected, counter, shape_image):
+                if individual_shape_selected:
+                    shape_selected = None
+                    counter +=1
+                if not individual_shape_selected and not shape_selected:
+                    shape_selected = shape_image
+                    counter += 1
+                return individual_shape_selected, shape_selected, counter
+
             # CIRCLE
             if cursor_over_circle_shape:
-                if circle_selected:
-                    shape_selected = None
-                    counter_circle += 1
-                if not circle_selected and not shape_selected:
-                    shape_selected = 'circle.bmp'
-                    counter_circle += 1
+                circle_selected, shape_selected, counter_circle = shape_selection_rule(circle_selected, shape_selected, counter_circle, 'circle.bmp')
+
             # SQUARE
-            if cursor_over_square_shape:
-                if square_selected:
-                    shape_selected = None
-                    counter_square += 1
-                if not square_selected and not shape_selected:
-                    shape_selected = 'square.bmp'
-                    counter_square += 1
+            elif cursor_over_square_shape:
+                square_selected, shape_selected, counter_square = shape_selection_rule(square_selected, shape_selected, counter_square, 'square.bmp')
+            
             # PEN
-            if cursor_over_pen_shape:
-                if pen_selected:
-                    shape_selected = None
-                    counter_pen += 1
-                if not pen_selected and not shape_selected:
-                    shape_selected = 'pen.bmp'
-                    counter_pen += 1
-            # PEN
-            if cursor_over_triangle_shape:
-                if triangle_selected:
-                    shape_selected = None
-                    counter_triangle += 1
-                if not triangle_selected and not shape_selected:
-                    shape_selected = 'triangle.bmp'
-                    counter_triangle += 1
+            elif cursor_over_pen_shape:
+                pen_selected, shape_selected, counter_pen = shape_selection_rule(pen_selected, shape_selected, counter_pen, 'pen.bmp')
+     
+            # TRIANGLE
+            elif cursor_over_triangle_shape:
+                triangle_selected, shape_selected, counter_triangle = shape_selection_rule(triangle_selected, shape_selected, counter_triangle, 'triangle.bmp')
+
+            ## ERASER
+            elif ERASER_RECT.collidepoint(event.pos):
+                eraser_moving = True
+            
+        elif event.type == pygame.MOUSEBUTTONUP:
+            eraser_moving = False
+        
+        elif event.type == pygame.MOUSEMOTION and eraser_moving:
+            if 150 < x_coord < SCREEN_WIDTH - 150:
+                ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement
+            
+    # ERASER IMAGE
+    screen.blit(ERASER_image_scaled, ERASER_RECT)
 
     pygame.display.update()
     clock.tick(60)
