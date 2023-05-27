@@ -3,11 +3,8 @@ from pathlib import Path
 import os
 
 # COLORS
-YELLOW = (255, 255, 0)
-BLUE = (0, 0, 255)
-BLACK = (0, 0, 0)
-GREY = (192, 192, 192)
-COLOR = GREY
+COLOR = 'Grey'
+ERASER_COLOR = 'White'
 
 #SCREEN
 SCREEN_WIDTH = 800
@@ -66,6 +63,7 @@ TRIANGLE_SHAPE_SELECT = {
 # SHAPE SELECTED/DESELECTED COUNTER
 counter_circle, counter_square, counter_pen, counter_triangle  = [1, 1, 1, 1]
 
+''' -- PYGAME -- '''
 pygame.init()
 
 clock = pygame.time.Clock()
@@ -81,27 +79,27 @@ def generating_shapes():
             if item == 'circle.bmp':
                 SIDE = CIRCLE_SIZE * 2    # just for the 'screen_shape' screen -> to generate new image
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
-                screen_shape.fill(BLACK)
+                screen_shape.fill('Black')
                 pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), CIRCLE_SIZE)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'circle.bmp'))
             # SQUARE
             if item == 'square.bmp':
                 screen_shape = pygame.display.set_mode((SQUARE_SIZE, SQUARE_SIZE))
-                screen_shape.fill(BLACK)
+                screen_shape.fill('Black')
                 pygame.draw.rect(screen_shape, (COLOR), [0, 0, SQUARE_SIZE, SQUARE_SIZE], 0)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'square.bmp'))
             # PEN
             if item == 'pen.bmp':
                 SIDE = PEN_SIZE * 2
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
-                screen_shape.fill(BLACK)
+                screen_shape.fill('Black')
                 pygame.draw.circle(screen_shape, (COLOR), (SIDE/2, SIDE/2), PEN_SIZE)
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'pen.bmp'))
             # TRIANGLE
             if item == 'triangle.bmp':
                 SIDE = TRIANGLE_SIZE * 2
                 screen_shape = pygame.display.set_mode((SIDE, SIDE))
-                screen_shape.fill(BLACK)
+                screen_shape.fill('Black')
                 pygame.draw.polygon(screen_shape, (COLOR), ((TRIANGLE_SIZE, 0), (SIDE, SIDE), (0, SIDE)))
                 pygame.image.save(screen_shape, Path(SHAPES_DIRECTORY, 'triangle.bmp'))
 
@@ -124,10 +122,11 @@ ERASER_image = pygame.image.load(Path(PICTURES_DIRECTORY, 'eraser.png')).convert
 ERASER_image_width = int(ERASER_image.get_width() / SCALE_ERASER)
 ERASER_image_height = int(ERASER_image.get_height() / SCALE_ERASER)
 ERASER_image_scaled = pygame.transform.scale(ERASER_image, (ERASER_image_width, ERASER_image_height))
-ERASER_image_scaled.set_colorkey(BLACK)
+ERASER_image_scaled.set_colorkey('Black')
 ERASER_RECT = ERASER_image_scaled.get_rect()
-ERASER_RECT.center = 150, 520
+ERASER_RECT.center = 150, 520   # ERASER_image_scaled and ERASER_RECT location
 
+''' LOOP '''
 run = True
 eraser_moving = False
 while run:
@@ -146,7 +145,7 @@ while run:
     front_BG_image_width = int(front_BG_image.get_width() / SCALE)
     front_BG_image_height = int(front_BG_image.get_height() / SCALE)
     front_BG_image_scaled = pygame.transform.scale(front_BG_image, (front_BG_image_width, front_BG_image_height))
-    front_BG_image_scaled.set_colorkey(BLACK)
+    front_BG_image_scaled.set_colorkey('Black')
 
     # CURRENT CURSOR COORDINATES
     x_coord, y_coord = pygame.mouse.get_pos()
@@ -164,7 +163,7 @@ while run:
     # CURSOR IMAGE COORDINATES 
     if shape_selected:
         cursor_image = pygame.image.load(Path(SHAPES_DIRECTORY, shape_selected)).convert()
-        cursor_image.set_colorkey(BLACK)
+        cursor_image.set_colorkey('Black')
         cursor_img_width = cursor_image.get_width()
         cursor_img_height = cursor_image.get_height()
         cursor_with_image_position = (x_coord - cursor_img_width/2, y_coord - cursor_img_height/2)
@@ -189,9 +188,14 @@ while run:
                                     ((x_coord, y_coord - TRIANGLE_SIZE),
                                      (x_coord + TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE),
                                      (x_coord - TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE)))
-            pygame.image.save(screen, BG_TEMP_PATH)
-            BG_image_scaled = pygame.image.load(BG_TEMP_PATH).convert()
-            screen.blit(BG_image_scaled, (0,0))
+        BG_image_scaled = saving_and_displaying_modified_BG_img()
+
+    def saving_and_displaying_modified_BG_img():
+        pygame.image.save(screen, BG_TEMP_PATH)
+        BG_image_scaled = pygame.image.load(BG_TEMP_PATH).convert()
+        screen.blit(BG_image_scaled, (0,0))
+        return BG_image_scaled
+
 
     # DISPLAY THE CURSOR IMAGE(if selected) 
     # & DISPLAY THE BG (the previously modified if drawing already actioned)
@@ -200,10 +204,7 @@ while run:
         if shape_selected and cursor_over_drawing_surface:
             screen.blit(cursor_image, cursor_with_image_position)
 
-    # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
-    screen.blit(front_BG_image_scaled, (0,0))
-
-    
+        
 # EVENT HANDLING  
     for event in pygame.event.get():
         
@@ -211,6 +212,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+        # MOUSEBUTTONDOWN
         # SHAPES PICKUP RULES
         # YOU HAVE TO PUT BACK THE CURRENT ONE BEFORE USING ANOTHER ONE    
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -245,13 +247,23 @@ while run:
             elif ERASER_RECT.collidepoint(event.pos):
                 eraser_moving = True
             
+        # MOUSEBUTTONUP
         elif event.type == pygame.MOUSEBUTTONUP:
             eraser_moving = False
         
+        # MOUSEMOTION
         elif event.type == pygame.MOUSEMOTION and eraser_moving:
-            if 150 < x_coord < SCREEN_WIDTH - 150:
+            if 120 < x_coord < SCREEN_WIDTH - 120:
+                # MOVE ERASER
                 ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement
-            
+                # DRAW RECT./ERASE SURFACE
+                pygame.draw.rect(screen, (ERASER_COLOR), [ x_coord-40, 100, 50, 400], 0)
+                BG_image_scaled = saving_and_displaying_modified_BG_img()
+
+    
+    # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
+    screen.blit(front_BG_image_scaled, (0,0))
+
     # ERASER IMAGE
     screen.blit(ERASER_image_scaled, ERASER_RECT)
 
