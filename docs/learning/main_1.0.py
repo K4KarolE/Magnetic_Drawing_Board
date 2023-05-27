@@ -1,3 +1,8 @@
+''' 
+With continuous cursor image generation
+-> continuous background image saving and reloading (not efficient, avoidable)
+'''
+
 import pygame
 from pathlib import Path
 import os
@@ -18,7 +23,7 @@ PICTURES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'pictures')
 BG_TEMP_PATH = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
 
 # SHAPES AND SIZES
-SIZE = 30
+SIZE = 35
 shape_size_dict = {
     'circle.bmp': SIZE,
     'square.bmp': SIZE * 1.8,
@@ -65,6 +70,7 @@ counter_circle, counter_square, counter_pen, counter_triangle  = [1, 1, 1, 1]
 
 ''' -- PYGAME -- '''
 pygame.init()
+
 clock = pygame.time.Clock()
 
 # GENERATING SHAPES - IF SIZE CHANGES
@@ -104,7 +110,6 @@ def generating_shapes():
 
 generating_shapes()
 
-
 # SCREEN
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Magnetic Drawing Board')
@@ -127,7 +132,7 @@ GRID_image_scaled.set_colorkey('Black')
 GRID_image_scaled.set_alpha(10)    # opacity 0-255
 
 # ERASER IMAGE
-SCALE_ERASER = 2
+SCALE_ERASER = 2.5
 ERASER_image = pygame.image.load(Path(PICTURES_DIRECTORY, 'eraser.png')).convert()
 ERASER_image_width = int(ERASER_image.get_width() / SCALE_ERASER)
 ERASER_image_height = int(ERASER_image.get_height() / SCALE_ERASER)
@@ -140,15 +145,6 @@ ERASER_RECT.center = 150, 520   # ERASER_image and ERASER_RECT location
 run = True
 eraser_moving = False
 while run:
-
-    # CURSOR IMAGE
-    if shape_selected:
-        cursor_image = pygame.image.load(Path(SHAPES_DIRECTORY, shape_selected)).convert()
-        cursor_image.set_colorkey('Black')
-        cursor_size = int(cursor_image.get_width())
-        cursor_surface = pygame.Surface((cursor_size, cursor_size), pygame.SRCALPHA)
-        cursor_surface.blit(cursor_image, (0,0))
-        cursor_selected = pygame.cursors.Cursor((int(cursor_size/2), int(cursor_size/2)), cursor_surface)
 
     # SHAPE SELECTED/DESELECTED COUNTER
     circle_selected = counter_circle % 2 == 0
@@ -179,20 +175,51 @@ while run:
 
     cursor_over_objects = cursor_over_circle_shape or cursor_over_square_shape or cursor_over_pen_shape or cursor_over_triangle_shape
 
+    # CURSOR IMAGE COORDINATES 
+    if shape_selected:
+        cursor_image = pygame.image.load(Path(SHAPES_DIRECTORY, shape_selected)).convert()
+        cursor_image.set_colorkey('Black')
+        cursor_img_width = cursor_image.get_width()
+        cursor_img_height = cursor_image.get_height()
+        cursor_with_image_position = (x_coord - cursor_img_width/2, y_coord - cursor_img_height/2)
+
     # STANDARD CURSOR TYPE CHANGE OVER SHAPES SELECTION
     if cursor_over_objects:
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-    elif shape_selected and cursor_over_drawing_surface:
-        pygame.mouse.set_cursor(cursor_selected)
-    elif not cursor_over_objects or not cursor_over_drawing_surface:
+    else:
         pygame.mouse.set_cursor()
 
-    # DRAWING
+    # DRAWING & SAVING THE MODIFIED BG IMAGE
     if pygame.mouse.get_pressed()[0] == True:
         if shape_selected and cursor_over_drawing_surface:
-            drawing_surface_image.blit(cursor_image, (x_coord-int(cursor_size/2), y_coord-int(cursor_size/2)))
+            if shape_selected == 'circle.bmp':
+                pygame.draw.circle(drawing_surface_image, (COLOR), (x_coord, y_coord), CIRCLE_SIZE)
+            elif shape_selected == 'square.bmp':
+                pygame.draw.rect(drawing_surface_image, (COLOR), [x_coord - SQUARE_SIZE/2, y_coord - SQUARE_SIZE/2, SQUARE_SIZE, SQUARE_SIZE], 0)
+            elif shape_selected == 'pen.bmp':
+                pygame.draw.circle(drawing_surface_image, (COLOR), (x_coord, y_coord), PEN_SIZE)
+            elif shape_selected == 'triangle.bmp':
+                pygame.draw.polygon(drawing_surface_image, (COLOR),
+                                    ((x_coord, y_coord - TRIANGLE_SIZE),
+                                     (x_coord + TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE),
+                                     (x_coord - TRIANGLE_SIZE, y_coord + TRIANGLE_SIZE)))
+        drawing_surface_image = saving_and_displaying_modified_BG_img(drawing_surface_image)
+
+    def saving_and_displaying_modified_BG_img(drawing_surface_image):
+        pygame.image.save(drawing_surface_image, BG_TEMP_PATH)
+        drawing_surface_image = pygame.image.load(BG_TEMP_PATH).convert()
+        screen.blit(drawing_surface_image, (0,0))
+        return drawing_surface_image
 
 
+    # DISPLAY THE CURSOR IMAGE(if selected) 
+    # & DISPLAY THE BG (the previously modified if drawing already actioned)
+    if pygame.mouse.get_pressed()[0] == False:
+        screen.blit(drawing_surface_image, (0,0))
+        if shape_selected and cursor_over_drawing_surface:
+            screen.blit(cursor_image, cursor_with_image_position)
+
+        
 # EVENT HANDLING  
     for event in pygame.event.get():
         
@@ -202,8 +229,7 @@ while run:
 
         # MOUSEBUTTONDOWN
         # SHAPES PICKUP RULES
-        # YOU HAVE TO PUT BACK THE CURRENT ONE BEFORE USING ANOTHER ONE
-        # -> TO AVOID LOSING THE PIECES OF THE BOARD
+        # YOU HAVE TO PUT BACK THE CURRENT ONE BEFORE USING ANOTHER ONE    
         elif event.type == pygame.MOUSEBUTTONDOWN:
 
             ## SHAPE SELECTION RULE
@@ -247,9 +273,7 @@ while run:
                 ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement
                 # DRAW RECT./ERASE SURFACE
                 pygame.draw.rect(drawing_surface_image, (ERASER_COLOR), [ x_coord-40, 100, 50, 400], 0)
-
-    # GRID
-    screen.blit(drawing_surface_image, (0,0))
+                drawing_surface_image = saving_and_displaying_modified_BG_img(drawing_surface_image)
 
     # GRID
     drawing_surface_image.blit(GRID_image_scaled, (100,80))

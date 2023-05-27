@@ -1,5 +1,7 @@
-# Python program to move the image with the mouse
-# https://www.geeksforgeeks.org/how-to-move-an-image-with-the-mouse-in-pygame/
+'''
+Python program to move the image with the mouse
+https://www.geeksforgeeks.org/how-to-move-an-image-with-the-mouse-in-pygame/
+'''
 
 # Import the library pygame
 import pygame
