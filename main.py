@@ -116,6 +116,15 @@ BG_image_width = int(BG_image.get_width() / SCALE)
 BG_image_height = int(BG_image.get_height() / SCALE)
 BG_image_scaled = pygame.transform.scale(BG_image, (BG_image_width, BG_image_height))
 
+# GRID IMAGE
+SCALE_GRID = 6
+GRID_image = pygame.image.load(Path(BACKGROUND_DIRECTORY, 'grid.png')).convert()
+GRID_image_width = int(GRID_image.get_width() / SCALE_GRID)
+GRID_image_height = int(GRID_image.get_height() / SCALE_GRID)
+GRID_image_scaled = pygame.transform.scale(GRID_image, (GRID_image_width, GRID_image_height))
+GRID_image_scaled.set_colorkey('Black')
+GRID_image_scaled.set_alpha(10)    # opacity 0-255
+
 # ERASER IMAGE
 SCALE_ERASER = 2.5
 ERASER_image = pygame.image.load(Path(PICTURES_DIRECTORY, 'eraser.png')).convert()
@@ -260,6 +269,8 @@ while run:
                 pygame.draw.rect(screen, (ERASER_COLOR), [ x_coord-40, 100, 50, 400], 0)
                 BG_image_scaled = saving_and_displaying_modified_BG_img()
 
+    # GRID
+    screen.blit(GRID_image_scaled, (120,100))
     
     # DISPLAY THE FRONT/FRAME IMAGE - WITH NO DRAWING SURFACE
     screen.blit(front_BG_image_scaled, (0,0))
