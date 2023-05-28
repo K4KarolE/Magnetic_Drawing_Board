@@ -2,10 +2,6 @@ import pygame
 from pathlib import Path
 import os
 
-# COLORS
-COLOR = 'Grey'
-ERASER_COLOR = 'White'
-
 #SCREEN
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
@@ -16,7 +12,6 @@ WORKING_DIRECTORY = Path(os.path.dirname(__file__), 'docs', 'skin', 'classic')
 SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'shapes')
 BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'background')
 OBJECTS_DIRECTORY = Path(WORKING_DIRECTORY, 'objects')
-
 
 
 ''' -- PYGAME -- '''
@@ -64,34 +59,55 @@ GRID = display_surface('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 4, 
 BACKGROUND = display_surface('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')
 
 ## DISPLAY OBJECTS
+SHAPES_X_COORD = 98
 # CIRCLE
-CIRCLE, CIRCLE_RECT = display_object('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', 30, 60)
-
+CIRCLE, CIRCLE_RECT = display_object('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', SHAPES_X_COORD, 242)
 # SQUARE
-SQUARE, SQUARE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'square.png', 30, 150)
-
+SQUARE, SQUARE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'square.png', SHAPES_X_COORD, 350)
 # TRIANGLE
-TRIANGLE, TRIANGLE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', 30, 260)
+TRIANGLE, TRIANGLE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', SHAPES_X_COORD, 465)
 
+
+SHAPES = {
+    'circle': [CIRCLE, CIRCLE_RECT, 'cursor', False],
+    'square': [SQUARE, SQUARE_RECT, 'cursor', False],
+    'triangle': [TRIANGLE, TRIANGLE_RECT, 'cursor', False]
+    }
+
+## CURSOR IMAGES
+for shape in SHAPES.values():
+    surf = pygame.Surface((80, 80), pygame.SRCALPHA)
+    surf.blit(shape[0], (0,0))
+    shape[2] = pygame.cursors.Cursor((40, 40), surf)
 
 
 ''' LOOP '''
 run = True
-eraser_moving = False
+moving = False
 while run:
+    # print(pygame.mouse.get_pos())
+
     for event in pygame.event.get():
+
+        # MOUSEBUTTONDOWN
+        if event.type == pygame.MOUSEBUTTONDOWN:
+
+            for shape in SHAPES.values():
+                if shape[1].collidepoint(event.pos):
+                    pygame.mouse.set_cursor(shape[2])
+                    shape[3] = True
+            moving = True
     
+        # # MOUSEMOTION
+        # elif event.type == pygame.MOUSEMOTION and moving:
+        #     selected_object.move_ip(event.rel)
 
-
-
-
-
-
-
-
+        # MOUSEBUTTONUP
+        elif event.type == pygame.MOUSEBUTTONUP:
+            moving = False
 
         # QUIT
-        if event.type == pygame.QUIT:
+        elif event.type == pygame.QUIT:
             run = False
     
     # DISPLAY DRAWING SURFACE
@@ -104,14 +120,9 @@ while run:
     screen.blit(BACKGROUND, (0,0))
 
     ## DISPLAY OBJECTS
-    # CIRCLE
-    screen.blit(CIRCLE, CIRCLE_RECT)
-
-    # SQUARE
-    screen.blit(SQUARE, SQUARE_RECT)
-
-    # TRIANGLE
-    screen.blit(TRIANGLE, TRIANGLE_RECT)
+    for shape in SHAPES.values():
+        if shape[3] == False:
+            screen.blit(shape[0], shape[1])     # (image, image_rect)
 
     pygame.display.update()
     clock.tick(60)
