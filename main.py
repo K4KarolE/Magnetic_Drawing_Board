@@ -15,7 +15,6 @@ WORKING_DIRECTORY = os.path.dirname(__file__)
 SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
 BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'background')
 PICTURES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'pictures')
-BG_TEMP_PATH = Path(WORKING_DIRECTORY, 'docs', 'skin', 'temp', 'BG_temp.bmp')
 
 # SHAPES AND SIZES
 SIZE = 30
@@ -25,13 +24,14 @@ shape_size_dict = {
     'pen.bmp': SIZE / 3,
     'triangle.bmp': SIZE
     }
+shape_selected = None
 
 CIRCLE_SIZE = shape_size_dict['circle.bmp']
 SQUARE_SIZE = shape_size_dict['square.bmp']
 PEN_SIZE = shape_size_dict['pen.bmp']
 TRIANGLE_SIZE = shape_size_dict['triangle.bmp']
 
-shape_selected = None
+cursor_rotation = 0 
 
 ## CURSOR / SURFACE MAP
 # DRAWING SURFACE
@@ -143,8 +143,12 @@ while run:
 
     # CURSOR IMAGE
     if shape_selected:
+        #LOAD
         cursor_image = pygame.image.load(Path(SHAPES_DIRECTORY, shape_selected)).convert()
         cursor_image.set_colorkey('Black')
+        # ROTATION
+        cursor_image = pygame.transform.rotate(cursor_image, cursor_rotation)
+        # GENERATE
         cursor_size = int(cursor_image.get_width())
         cursor_surface = pygame.Surface((cursor_size, cursor_size), pygame.SRCALPHA)
         cursor_surface.blit(cursor_image, (0,0))
@@ -187,6 +191,7 @@ while run:
     elif not cursor_over_objects or not cursor_over_drawing_surface:
         pygame.mouse.set_cursor()
 
+    
     # DRAWING
     if pygame.mouse.get_pressed()[0] == True:
         if shape_selected and cursor_over_drawing_surface:
@@ -207,34 +212,44 @@ while run:
         elif event.type == pygame.MOUSEBUTTONDOWN:
 
             ## SHAPE SELECTION RULE
-            def shape_selection_rule(individual_shape_selected, shape_selected, counter, shape_image):
+            def shape_selection_rule(individual_shape_selected, shape_selected, counter, shape_image, cursor_rotation):
                 if individual_shape_selected:
                     shape_selected = None
                     counter +=1
+                    cursor_rotation = 0
                 if not individual_shape_selected and not shape_selected:
                     shape_selected = shape_image
                     counter += 1
-                return individual_shape_selected, shape_selected, counter
+                return individual_shape_selected, shape_selected, counter, cursor_rotation
 
             # CIRCLE
             if cursor_over_circle_shape:
-                circle_selected, shape_selected, counter_circle = shape_selection_rule(circle_selected, shape_selected, counter_circle, 'circle.bmp')
+                circle_selected, shape_selected, counter_circle, cursor_rotation = shape_selection_rule(circle_selected, shape_selected, counter_circle, 'circle.bmp', cursor_rotation)
 
             # SQUARE
             elif cursor_over_square_shape:
-                square_selected, shape_selected, counter_square = shape_selection_rule(square_selected, shape_selected, counter_square, 'square.bmp')
+                square_selected, shape_selected, counter_square, cursor_rotation = shape_selection_rule(square_selected, shape_selected, counter_square, 'square.bmp', cursor_rotation)
             
             # PEN
             elif cursor_over_pen_shape:
-                pen_selected, shape_selected, counter_pen = shape_selection_rule(pen_selected, shape_selected, counter_pen, 'pen.bmp')
+                pen_selected, shape_selected, counter_pen, cursor_rotation = shape_selection_rule(pen_selected, shape_selected, counter_pen, 'pen.bmp', cursor_rotation)
      
             # TRIANGLE
             elif cursor_over_triangle_shape:
-                triangle_selected, shape_selected, counter_triangle = shape_selection_rule(triangle_selected, shape_selected, counter_triangle, 'triangle.bmp')
+                triangle_selected, shape_selected, counter_triangle, cursor_rotation = shape_selection_rule(triangle_selected, shape_selected, counter_triangle, 'triangle.bmp', cursor_rotation)
+
 
             ## ERASER
             elif ERASER_RECT.collidepoint(event.pos):
                 eraser_moving = True
+
+            ## CURSOR ROTATION
+            # TO LEFT - MIDDLE MOUSE BUTTON
+            elif pygame.mouse.get_pressed()[1] == True:
+                cursor_rotation += 10
+            # TO RIGHT - RIGHT MOUSE BUTTON
+            elif pygame.mouse.get_pressed()[2] == True:
+                cursor_rotation -= 10
             
         # MOUSEBUTTONUP
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -246,9 +261,9 @@ while run:
                 # MOVE ERASER
                 ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement
                 # DRAW RECT./ERASE SURFACE
-                pygame.draw.rect(drawing_surface_image, (ERASER_COLOR), [ x_coord-40, 100, 50, 400], 0)
+                pygame.draw.rect(drawing_surface_image, (ERASER_COLOR), [ x_coord-40, 90, 50, 450], 0)
 
-    # GRID
+    # DRAWING SURFACE
     screen.blit(drawing_surface_image, (0,0))
 
     # GRID
