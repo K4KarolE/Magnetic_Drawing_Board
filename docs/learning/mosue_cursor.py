@@ -16,6 +16,9 @@ SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
 # Creating a canvas of 600*400
 screen = pygame.display.set_mode((600, 400))
 clock = pygame.time.Clock()
+
+# sandard cursor
+# pygame.mouse.set_cursor()
   
 # old type, "bitmap" cursor
 cursor1 = pygame.cursors.diamond
