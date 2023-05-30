@@ -36,7 +36,7 @@ def generate_asset(image_name, directory, file_name, x_coord=0, y_coord=0, scale
 
 # DRAWING SURFACE IMAGE
 DRAWING_SURFACE = generate_asset('DRAWING_SURFACE', BACKGROUND_DIRECTORY, 'drawing_surface.png')[0]
-DRAWING_SURFACE_RECT = pygame.Rect((171, 121), (833, 509))  # Rect(left, top, width, height)
+DRAWING_SURFACE_RECT = pygame.Rect((171, 121), (820, 500))  # Rect(left, top, width, height)
 
 # GRID
 GRID = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255) // [0] RECT will not be used
@@ -56,7 +56,9 @@ SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', 
 # TRIANGLE
 TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', SHAPES_X_COORD, 465)
 # PEN
-PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', 1050, 350)
+PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', 1050, 350, 3)
+# PEN ACTIVE
+PEN_ACTIVE = generate_asset('PEN_ACTIVE', OBJECTS_DIRECTORY, 'pen_active.png')[0]
 
 SHAPES = {
     'circle': {
@@ -108,12 +110,17 @@ OBJECT_RECT_LIST = []
 # GENERATE CURSOR / DRAWING IMAGES
 for shape in SHAPES.values():
     # CURSOR IMAGES
-    image_width, image_height = shape['image'].get_size()
+    if shape['image'] == PEN:
+        image = PEN_ACTIVE
+    else:
+        image = shape['image']
+    image_width, image_height = image.get_size()
     shape['cursor_size'] = [image_width, image_height]
     surf = pygame.Surface((image_width, image_height), pygame.SRCALPHA)
-    surf.blit(shape['image'], (0,0))
-    if shape['image'] == PEN:
-        shape['cursor'] = pygame.cursors.Cursor((0, 0), surf)   # cursor top left corner
+    surf.blit(image, (0,0))
+    if image == PEN_ACTIVE:
+        print(image_width, image_height)
+        shape['cursor'] = pygame.cursors.Cursor((0, image_height-18), surf)   # cursor bottom left corner
     else:
         shape['cursor'] = pygame.cursors.Cursor((int(image_width/2), int(image_height/2)), surf)   # cursor in the middle
     # DRAWING IMAGES
@@ -186,12 +193,12 @@ while run:
                         shape['selected'] = True     # shape image will not be displayed -> cursor will have the shape image
                         drawing_shape = shape['drawing_image']
                         # DRAWING CORIGATION - CURSOR POSITION VS CURSOR IMAGE
-                        if shape['image'] != PEN:
+                        if shape['image'] == PEN:
+                            drawing_corigation_x = 0 # + 5    # drawing in the top left of the PEN cursor image
+                            drawing_corigation_y = 0 #-shape['cursor_size'][1] + 10
+                        else:    
                             drawing_corigation_x = int(shape['cursor_size'][0] / 2)     # drawing in middle of the cursor image
                             drawing_corigation_y = int(shape['cursor_size'][1] / 2)
-                        else:
-                            drawing_corigation_x = 0    # drawing in the top left of the PEN cursor image
-                            drawing_corigation_y = 0
                     # DESELECT THE SHAPE
                     elif shape['selected']:          # shape image not displayed = that is the selected one -> able to "put back"
                         a_shape_selected = False
@@ -204,7 +211,7 @@ while run:
                             rotate_images(shape, shape['rotation'])
 
                 # IMAGE ROTATION
-                if shape['selected']:
+                if shape['selected'] and shape['image'] != PEN and shape['image'] != CIRCLE:
                     # TO ROTATE LEFT - MIDDLE MOUSE BUTTON
                     if pygame.mouse.get_pressed()[1] == True:    
                         shape['rotation'] += 10
