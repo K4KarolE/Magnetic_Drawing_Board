@@ -21,43 +21,42 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Magnetic Drawing Board')
 
 
-def display_object(image_name, directory, file_name, x_coord=0, y_coord=0, scale=1, opacity=255):
-    image_name = pygame.image.load(Path(directory, file_name)).convert()
+def generate_asset(image_name, directory, file_name, x_coord=0, y_coord=0, scale=1, opacity=255):
+    image_name = pygame.image.load(Path(directory, file_name)).convert_alpha()
     if scale != 1:
         image_name_width = int(image_name.get_width() / scale)
         image_name_height = int(image_name.get_height() / scale)
         image_name = pygame.transform.scale(image_name, (image_name_width, image_name_height))
     if opacity != 255:
         image_name.set_alpha(opacity)
-    image_name.set_colorkey('Black')
     image_name_rect = image_name.get_rect()
     image_name_rect.center = x_coord, y_coord
     return image_name, image_name_rect
 
 
 # DRAWING SURFACE IMAGE
-DRAWING_SURFACE = display_object('DRAWING_SURFACE', BACKGROUND_DIRECTORY, 'drawing_surface.png')[0]
+DRAWING_SURFACE = generate_asset('DRAWING_SURFACE', BACKGROUND_DIRECTORY, 'drawing_surface.png')[0]
 DRAWING_SURFACE_RECT = pygame.Rect((171, 121), (833, 509))  # Rect(left, top, width, height)
 
 # GRID
-GRID = display_object('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255) // [0] RECT will not be used
+GRID = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255) // [0] RECT will not be used
 
 # BACKGROUND IMAGE
-BACKGROUND = display_object('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')[0]
+BACKGROUND = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')[0]
 
 # ERASER
-ERASER, ERASER_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', 153, 668)
+ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', 153, 668)
 
 ## SHAPES
 SHAPES_X_COORD = 98
 # CIRCLE
-CIRCLE, CIRCLE_RECT = display_object('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', SHAPES_X_COORD, 242)
+CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', SHAPES_X_COORD, 242)
 # SQUARE
-SQUARE, SQUARE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'square.png', SHAPES_X_COORD, 350)
+SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', SHAPES_X_COORD, 350)
 # TRIANGLE
-TRIANGLE, TRIANGLE_RECT = display_object('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', SHAPES_X_COORD, 465)
+TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', SHAPES_X_COORD, 465)
 # PEN
-PEN, PEN_RECT = display_object('PEN', OBJECTS_DIRECTORY, 'pen.png', 1050, 350)
+PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', 1050, 350)
 
 SHAPES = {
     'circle': {
@@ -106,10 +105,10 @@ SHAPES = {
 
 OBJECT_RECT_LIST = []
 
+# GENERATE CURSOR / DRAWING IMAGES
 for shape in SHAPES.values():
     # CURSOR IMAGES
-    image_width = int(shape['image'].get_width())
-    image_height = int(shape['image'].get_height())
+    image_width, image_height = shape['image'].get_size()
     shape['cursor_size'] = [image_width, image_height]
     surf = pygame.Surface((image_width, image_height), pygame.SRCALPHA)
     surf.blit(shape['image'], (0,0))
@@ -118,7 +117,7 @@ for shape in SHAPES.values():
     else:
         shape['cursor'] = pygame.cursors.Cursor((int(image_width/2), int(image_height/2)), surf)   # cursor in the middle
     # DRAWING IMAGES
-    shape['drawing_image'] = display_object('DRAWING_IMAGE', DRAWING_DIRECTORY, shape['drawing_file'])[0]  # [0] - just the image no RECT
+    shape['drawing_image'] = generate_asset('DRAWING_IMAGE', DRAWING_DIRECTORY, shape['drawing_file'])[0]  # [0] - just the image no RECT
     # RECT LIST
     OBJECT_RECT_LIST.append(shape['image_rect'])
 
@@ -147,14 +146,19 @@ while run:
 
     # CURSOR OVER OBJECTS
     if a_shape_selected == False:
+        # CIRCLE
         if OBJECT_RECT_LIST[0].collidepoint(cursor_coord_x, cursor_coord_y):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        # SQUARE
         elif OBJECT_RECT_LIST[1].collidepoint(cursor_coord_x, cursor_coord_y):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        # TRIANGLE
         elif OBJECT_RECT_LIST[2].collidepoint(cursor_coord_x, cursor_coord_y):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        # PEN
         elif OBJECT_RECT_LIST[3].collidepoint(cursor_coord_x, cursor_coord_y):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        # ERASER
         elif OBJECT_RECT_LIST[4].collidepoint(cursor_coord_x, cursor_coord_y):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
         else:
