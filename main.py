@@ -6,8 +6,13 @@ import os
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 
+# SKIN
+skin_selected = 'classic'
+skin_selected = 'minimal'
+
 # PATHS
-WORKING_DIRECTORY = Path(os.path.dirname(__file__), 'docs', 'skin', 'classic')
+CURRENT_DIRECTORY = os.path.dirname(__file__)
+WORKING_DIRECTORY = Path(CURRENT_DIRECTORY, 'docs', 'skin', skin_selected)
 DRAWING_DIRECTORY = Path(WORKING_DIRECTORY, 'drawing')
 OBJECTS_DIRECTORY = Path(WORKING_DIRECTORY, 'objects')
 BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'background')
@@ -19,6 +24,11 @@ clock = pygame.time.Clock()
 # SCREEN
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Magnetic Drawing Board')
+
+def capture_screen():
+        sub = DRAWING_SURFACE.subsurface(DRAWING_SURFACE_RECT)
+        sub = screen
+        pygame.image.save(sub, Path(CURRENT_DIRECTORY, 'screenshot', 'screenshot.png'))
 
 
 def generate_asset(image_name, directory, file_name, x_coord=0, y_coord=0, scale=1, opacity=255):
@@ -45,20 +55,20 @@ GRID = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0
 BACKGROUND = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')[0]
 
 # ERASER
-ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', 153, 668)
+ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', 153, 680)
 
 ## SHAPES
 SHAPES_X_COORD = 98
 # CIRCLE
-CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', SHAPES_X_COORD, 242)
+CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', SHAPES_X_COORD, 245)
 # SQUARE
 SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', SHAPES_X_COORD, 350)
 # TRIANGLE
 TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', SHAPES_X_COORD, 465)
 # PEN
-PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', 1050, 350, 3)
+PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', 1060, 345, 3)
 # PEN ACTIVE
-PEN_ACTIVE = generate_asset('PEN_ACTIVE', OBJECTS_DIRECTORY, 'pen_active.png')[0]
+PEN_ACTIVE = generate_asset('PEN_ACTIVE', OBJECTS_DIRECTORY, 'pen_active.png', 0, 0, 3)[0]
 
 SHAPES = {
     'circle': {
@@ -119,7 +129,6 @@ for shape in SHAPES.values():
     surf = pygame.Surface((image_width, image_height), pygame.SRCALPHA)
     surf.blit(image, (0,0))
     if image == PEN_ACTIVE:
-        print(image_width, image_height)
         shape['cursor'] = pygame.cursors.Cursor((0, image_height-18), surf)   # cursor bottom left corner
     else:
         shape['cursor'] = pygame.cursors.Cursor((int(image_width/2), int(image_height/2)), surf)   # cursor in the middle
@@ -269,6 +278,7 @@ while run:
 
     # ERASER
     screen.blit(ERASER, ERASER_RECT)
+
 
     pygame.display.update()
     clock.tick(60)
