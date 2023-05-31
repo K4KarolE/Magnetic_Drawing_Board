@@ -28,7 +28,8 @@
     "eraser": {
         "coord":[160, 680],
         "scale": 3,
-        "opacity": 255
+        "opacity": 255,
+        "interval":[160, 130]
         },
     "drawing_surface_rect": {
         "coord":[171, 121],
@@ -37,23 +38,23 @@
     },
 "classic": {
     "circle": {
-        "coord":[107, 300],
+        "coord":[125, 330],
         "scale": 1,
         "opacity": 255
         },
     "square": {
-        "coord":[106, 409],
+        "coord":[125, 552],
         "scale": 1,
         "opacity": 255
         },
     "triangle": {
-        "coord":[107, 516],
+        "coord":[126, 445],
         "scale": 1,
         "opacity": 255
         },
     "pen": {
-        "coord":[900, 374],
-        "scale": 3,
+        "coord":[934, 424],
+        "scale": 1,
         "opacity": 255
         },
     "pen_active": {
@@ -62,9 +63,10 @@
         "opacity": 255
         },
     "eraser": {
-        "coord":[160, 680],
+        "coord":[180, 723],
         "scale": 3,
-        "opacity": 255
+        "opacity": 255,
+        "interval":[180, 330]
         },
     "drawing_surface_rect": {
         "coord":[171, 121],
