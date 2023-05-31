@@ -1,0 +1,74 @@
+{
+"minimal": {
+    "circle": {
+        "coord":[87, 250],
+        "scale": 1,
+        "opacity": 255
+        },
+    "square": {
+        "coord":[86, 359],
+        "scale": 1,
+        "opacity": 255
+        },
+    "triangle": {
+        "coord":[87, 466],
+        "scale": 1,
+        "opacity": 255
+        },
+    "pen": {
+        "coord":[1131, 374],
+        "scale": 3,
+        "opacity": 255
+        },
+    "pen_active": {
+        "coord":[0, 0],
+        "scale": 3,
+        "opacity": 255
+        },
+    "eraser": {
+        "coord":[160, 680],
+        "scale": 3,
+        "opacity": 255
+        },
+    "drawing_surface_rect": {
+        "coord":[171, 121],
+        "size": [900, 500]
+        }
+    },
+"classic": {
+    "circle": {
+        "coord":[107, 300],
+        "scale": 1,
+        "opacity": 255
+        },
+    "square": {
+        "coord":[106, 409],
+        "scale": 1,
+        "opacity": 255
+        },
+    "triangle": {
+        "coord":[107, 516],
+        "scale": 1,
+        "opacity": 255
+        },
+    "pen": {
+        "coord":[900, 374],
+        "scale": 3,
+        "opacity": 255
+        },
+    "pen_active": {
+        "coord":[0, 0],
+        "scale": 3,
+        "opacity": 255
+        },
+    "eraser": {
+        "coord":[160, 680],
+        "scale": 3,
+        "opacity": 255
+        },
+    "drawing_surface_rect": {
+        "coord":[171, 121],
+        "size": [900, 500]
+        }
+    }
+}

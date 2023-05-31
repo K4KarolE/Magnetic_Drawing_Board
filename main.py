@@ -3,6 +3,7 @@
 import pygame
 from pathlib import Path
 import os
+import json
 
 #SCREEN
 SCREEN_WIDTH = 1200
@@ -10,6 +11,22 @@ SCREEN_HEIGHT = 800
 
 skin_selected = 'classic'
 skin_selected = 'minimal'
+
+# LOADING DATA
+f = open(Path(os.path.dirname(__file__), 'docs', 'skin', 'skins.json'))
+SKINS = json.load(f)
+
+# OBJECT PARAMETERS DIC
+object_dic = {}
+for object_name in SKINS[skin_selected]:
+    for parameter in SKINS[skin_selected][object_name]:
+        object_parameter = f'{object_name}_{parameter}'   # 'circle_coord'
+        object_parameter_value = SKINS[skin_selected][object_name][parameter] # [87, 250]
+        object_dic[object_parameter] = object_parameter_value  # 'circle_coord': [87, 250]
+# 'circle_coord': [87, 250], 'circle_scale': 1, 'circle_opacity': 255,..
+# object_dic['circle_coord'][0] = 87
+# skins[skin_selected]['circle']['coord'][0] = 87   / instead of using this line - the previous one looks better
+    
 
 def main(skin_selected):
     # PATHS
@@ -44,93 +61,9 @@ def main(skin_selected):
         image_name_rect.center = x_coord, y_coord
         return image_name, image_name_rect
 
-    # PARAMETERS / SKINS
-    SKINS = {'minimal': {'circle': {
-                        'coord':[87, 250],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'square': {
-                        'coord':[86, 359],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'triangle': {
-                        'coord':[87, 466],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'pen': {
-                        'coord':[1131, 374],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'pen_active': {
-                        'coord':[0, 0],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'eraser': {
-                        'coord':[160, 680],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'drawing_surface_rect': {
-                        'coord':[171, 121],
-                        'size': [900, 500],
-                        }
-                    },
-            'classic': {'circle': {
-                        'coord':[107, 300],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'square': {
-                        'coord':[106, 409],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'triangle': {
-                        'coord':[107, 516],
-                        'scale': 1,
-                        'opacity': 255
-                        },
-                    'pen': {
-                        'coord':[900, 374],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'pen_active': {
-                        'coord':[0, 0],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'eraser': {
-                        'coord':[160, 680],
-                        'scale': 3,
-                        'opacity': 255
-                        },
-                    'drawing_surface_rect': {
-                        'coord':[171, 121],
-                        'size': [900, 500],
-                        }
-                    }
-        }
-
-    # SHAPES PARAMETERS DIC
-    shape_dic = {}
-    for shape_name in SKINS[skin_selected]:
-        for parameter in SKINS[skin_selected][shape_name]:
-            shape_parameter = f'{shape_name}_{parameter}'   # 'circle_coord'
-            shape_parameter_value = SKINS[skin_selected][shape_name][parameter] # [87, 250]
-            shape_dic[shape_parameter] = shape_parameter_value  # 'circle_coord': [87, 250]
-    # 'circle_coord': [87, 250], 'circle_scale': 1, 'circle_opacity': 255,..
-    # shape_dic['circle_coord'][0] = 87
-    # skins[skin_selected]['circle']['coord'][0] = 87   / the previous one looks a bit better
-
     # DRAWING SURFACE IMAGE
     DRAWING_SURFACE = generate_asset('DRAWING_SURFACE', BACKGROUND_DIRECTORY, 'drawing_surface.png')[0] # [0] -> RECT will not be used
-    DRAWING_SURFACE_RECT = pygame.Rect((shape_dic['drawing_surface_rect_coord'][0], shape_dic['drawing_surface_rect_coord'][1]), (shape_dic['drawing_surface_rect_size'][0], shape_dic['drawing_surface_rect_size'][1]))  # Rect(left, top, width, height)
+    DRAWING_SURFACE_RECT = pygame.Rect((object_dic['drawing_surface_rect_coord'][0], object_dic['drawing_surface_rect_coord'][1]), (object_dic['drawing_surface_rect_size'][0], object_dic['drawing_surface_rect_size'][1]))  # Rect(left, top, width, height)
 
     # GRID
     GRID = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255)
@@ -139,22 +72,22 @@ def main(skin_selected):
     BACKGROUND = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')[0]
 
     # ERASER
-    ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', shape_dic['eraser_coord'][0], shape_dic['eraser_coord'][1])
+    ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', object_dic['eraser_coord'][0], object_dic['eraser_coord'][1])
 
     # CIRCLE
-    CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', shape_dic['circle_coord'][0], shape_dic['circle_coord'][1])
+    CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', object_dic['circle_coord'][0], object_dic['circle_coord'][1])
     
     # SQUARE
-    SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', shape_dic['square_coord'][0], shape_dic['square_coord'][1])
+    SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', object_dic['square_coord'][0], object_dic['square_coord'][1])
     
     # TRIANGLE
-    TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', shape_dic['triangle_coord'][0], shape_dic['triangle_coord'][1])
+    TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', object_dic['triangle_coord'][0], object_dic['triangle_coord'][1])
     
     # PEN
-    PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', shape_dic['pen_coord'][0],  shape_dic['pen_coord'][1], shape_dic['pen_scale'])
+    PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', object_dic['pen_coord'][0],  object_dic['pen_coord'][1], object_dic['pen_scale'])
     
     # PEN ACTIVE
-    PEN_ACTIVE = generate_asset('PEN_ACTIVE', OBJECTS_DIRECTORY, 'pen_active.png', 0, 0, shape_dic['pen_active_scale'])[0]
+    PEN_ACTIVE = generate_asset('PEN_ACTIVE', OBJECTS_DIRECTORY, 'pen_active.png', 0, 0, object_dic['pen_active_scale'])[0]
 
     SHAPES = {
         'circle': {
