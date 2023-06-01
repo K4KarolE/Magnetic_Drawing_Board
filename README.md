@@ -1,9 +1,13 @@
-# Work in progress
-## Digital version of the beloved Magnetic Drawing Board 
+# Magnetic Drawing Board - Work in progress
 
 <br>
 <div align="center">
-    <img src="docs/skin/background/BG_original.jpg"</img> 
+    <img src="docs/promo/classic.png"</img> 
 </div>
 <br>
+<div align="center">
+    <img src="docs/promo/minimal.png"</img> 
+</div>
+
+
 
