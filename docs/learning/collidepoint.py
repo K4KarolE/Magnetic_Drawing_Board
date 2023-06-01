@@ -1,4 +1,10 @@
 ''' COLLIDEPOINT EXAMPLE '''
+'''
+# INVISIBLE RECT & COLLIDEPOINT
+SKIN_TEXT_VISIBILE_RECT = pygame.Rect(SCREEN_WIDTH - 100, 0, 120, 70)
+if SKIN_TEXT_VISIBILE_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
+...
+'''
 
 from pathlib import Path
 import os

@@ -9,24 +9,10 @@ import json
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 
-skin_selected = 'classic'
-skin_selected = 'minimal'
-
 # LOADING DATA
 f = open(Path(os.path.dirname(__file__), 'docs', 'skin', 'skins.json'))
 SKINS = json.load(f)
-
-# OBJECT PARAMETERS DIC
-object_dic = {}
-for object_name in SKINS[skin_selected]:
-    for parameter in SKINS[skin_selected][object_name]:
-        object_parameter = f'{object_name}_{parameter}'   # 'circle_coord'
-        object_parameter_value = SKINS[skin_selected][object_name][parameter] # [87, 250]
-        object_dic[object_parameter] = object_parameter_value  # 'circle_coord': [87, 250]
-# 'circle_coord': [87, 250], 'circle_scale': 1, 'circle_opacity': 255,..
-# object_dic['circle_coord'][0] = 87
-# skins[skin_selected]['circle']['coord'][0] = 87   / instead of using this line - the previous one looks better
-    
+  
 
 def main(skin_selected):
     # PATHS
@@ -36,6 +22,17 @@ def main(skin_selected):
     OBJECTS_DIRECTORY = Path(WORKING_DIRECTORY, 'objects')
     BACKGROUND_DIRECTORY = Path(WORKING_DIRECTORY, 'background')
 
+    # OBJECT PARAMETERS DIC
+    object_dic = {}
+    for object_name in SKINS[skin_selected]:
+        for parameter in SKINS[skin_selected][object_name]:
+            object_parameter = f'{object_name}_{parameter}'   # 'circle_coord'
+            object_parameter_value = SKINS[skin_selected][object_name][parameter] # [87, 250]
+            object_dic[object_parameter] = object_parameter_value  # 'circle_coord': [87, 250]
+    # 'circle_coord': [87, 250], 'circle_scale': 1, 'circle_opacity': 255,..
+    # object_dic['circle_coord'][0] = 87
+    # skins[skin_selected]['circle']['coord'][0] = 87   / instead of using this line - the previous one looks better
+
     ''' -- PYGAME -- '''
     pygame.init()
     clock = pygame.time.Clock()
@@ -44,10 +41,11 @@ def main(skin_selected):
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption('Magnetic Drawing Board')
 
-    def capture_screen():
-            sub = DRAWING_SURFACE.subsurface(DRAWING_SURFACE_RECT)
-            sub = screen
-            pygame.image.save(sub, Path(CURRENT_DIRECTORY, 'screenshot', 'screenshot.png'))
+    # SCREEN CAPTURE - LATER
+    # def capture_screen():
+    #         sub = DRAWING_SURFACE.subsurface(DRAWING_SURFACE_RECT)
+    #         sub = screen
+    #         pygame.image.save(sub, Path(CURRENT_DIRECTORY, 'screenshot', 'screenshot.png'))
 
     def generate_asset(image_name, directory, file_name, x_coord=0, y_coord=0, scale=1, opacity=255):
         image_name = pygame.image.load(Path(directory, file_name)).convert_alpha()
@@ -167,6 +165,30 @@ def main(skin_selected):
         # DRAWING IMAGE
         shape['drawing_image_rotated'] = pygame.transform.rotate(shape['drawing_image'], cursor_rotation)
 
+    ## TEXT / SELECT SKIN
+    font1 = pygame.font.SysFont('georgia', 20)
+    font2 = pygame.font.SysFont('consolas', 21)
+    # TO CHECK AVAILABLE FONTS
+    # print(pygame.font.get_fonts())
+    
+    if skin_selected == 'classic':
+        color_text = 'black'
+    else:
+        color_text = 'white'
+
+    text_classic = font1.render('Classic', True, (color_text))
+    text_minimal = font2.render('Minimal', True, (color_text))
+    
+    TEXT_CLASSIC_RECT = text_classic.get_rect()
+    TEXT_MINIMAL_RECT = text_minimal.get_rect()
+    
+    TEXT_X_COORD = SCREEN_WIDTH - 5
+    TEXT_Y_COORD = 40
+    TEXT_CLASSIC_RECT.bottomright = (TEXT_X_COORD, TEXT_Y_COORD)
+    TEXT_MINIMAL_RECT.bottomright = (TEXT_X_COORD, TEXT_Y_COORD + 30)
+
+   
+
     ''' -- LOOP -- '''
     run = True
     eraser_moving = False
@@ -175,6 +197,13 @@ def main(skin_selected):
     while run:
         cursor_coord_x, cursor_coord_y = pygame.mouse.get_pos()
         # print(cursor_coord_x, cursor_coord_y)
+
+        ## SKIN UPDATE
+        if pygame.mouse.get_pressed()[0] == True:
+            if TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'classic':
+                main('classic')
+            if TEXT_MINIMAL_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'minimal':
+                main('minimal')
 
         # CURSOR OVER OBJECTS
         if a_shape_selected == False:
@@ -193,11 +222,14 @@ def main(skin_selected):
             # ERASER
             elif ERASER_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+            # SKIN TEXT
+            elif TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) or TEXT_MINIMAL_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             else:
                 pygame.mouse.set_cursor()
         
         # DRAWING
-        if pygame.mouse.get_pressed()[0] == True and DRAWING_SURFACE_RECT.collidepoint(event.pos) and a_shape_selected:
+        if a_shape_selected and pygame.mouse.get_pressed()[0] == True and DRAWING_SURFACE_RECT.collidepoint(event.pos):
             DRAWING_SURFACE.blit(drawing_shape, (cursor_coord_x-drawing_corigation_x, cursor_coord_y-drawing_corigation_y))
 
         # EVENTS
@@ -205,7 +237,7 @@ def main(skin_selected):
 
             # MOUSEBUTTONDOWN
             if event.type == pygame.MOUSEBUTTONDOWN:
-
+                    
                 # SHAPES
                 for shape in SHAPES.values():
                     if shape['image_rect'].collidepoint(event.pos):
@@ -260,7 +292,7 @@ def main(skin_selected):
                 # ERASER          
                 if ERASER_RECT.collidepoint(event.pos):
                     eraser_moving = True
-
+                
             # MOUSEMOTION
             elif event.type == pygame.MOUSEMOTION and eraser_moving and a_shape_selected == False:
                 if object_dic['eraser_interval'][0] < cursor_coord_x < SCREEN_WIDTH - object_dic['eraser_interval'][1]:
@@ -295,6 +327,25 @@ def main(skin_selected):
         # ERASER
         screen.blit(ERASER, ERASER_RECT)
 
+        ## SKIN UPDATE TEXTS / RECTS
+        if skin_selected == 'classic':
+            color = 'white'
+        else:
+            color = 'black'
+
+        # SMALL RECT - INDICATION OF THE MENU
+        pygame.draw.rect(screen, (color), [SCREEN_WIDTH - 10, 10, 10, 70])
+
+        # CHECKING THE CURSOR POSITION -> CURSOR IS  OVER = MENU IS DISPLAYED
+        SKIN_TEXT_VISIBILE_RECT = pygame.Rect(SCREEN_WIDTH - 100, 0, 120, 70)
+        if SKIN_TEXT_VISIBILE_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
+            
+            # BACKGOUND RECT
+            pygame.draw.rect(screen, (color), [SCREEN_WIDTH - 100, 10, 120, 70])
+
+            # TEXT / SKIN SELECTION
+            screen.blit(text_classic, TEXT_CLASSIC_RECT)
+            screen.blit(text_minimal, TEXT_MINIMAL_RECT)
 
         pygame.display.update()
         clock.tick(60)
@@ -302,4 +353,4 @@ def main(skin_selected):
     pygame.quit()
 
 if __name__ == '__main__': 
-    main(skin_selected)
+    main(skin_selected = 'classic')     # default skin = classic
