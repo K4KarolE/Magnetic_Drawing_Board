@@ -59,7 +59,7 @@
         },
     "pen_active": {
         "coord":[0, 0],
-        "scale": 3,
+        "scale": 1,
         "opacity": 255
         },
     "eraser": {
@@ -69,8 +69,8 @@
         "interval":[180, 330]
         },
     "drawing_surface_rect": {
-        "coord":[171, 121],
-        "size": [900, 500]
+        "coord":[196, 173],
+        "size": [676, 492]
         }
     }
 }

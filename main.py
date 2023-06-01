@@ -10,7 +10,7 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 
 skin_selected = 'classic'
-# skin_selected = 'minimal'
+skin_selected = 'minimal'
 
 # LOADING DATA
 f = open(Path(os.path.dirname(__file__), 'docs', 'skin', 'skins.json'))
@@ -267,7 +267,7 @@ def main(skin_selected):
                     # MOVE ERASER
                     ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement allowed
                     # DRAW RECT./ERASE SURFACE
-                    pygame.draw.rect(DRAWING_SURFACE, ('White'), [cursor_coord_x-20, 120, 50, 540], 0)
+                    pygame.draw.rect(DRAWING_SURFACE, ('White'), [cursor_coord_x-20, 120, 50, 550], 0)
 
             # MOUSEBUTTONUP
             elif event.type == pygame.MOUSEBUTTONUP:
