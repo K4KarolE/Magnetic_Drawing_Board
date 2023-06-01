@@ -41,12 +41,6 @@ def main(skin_selected):
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption('Magnetic Drawing Board')
 
-    # SCREEN CAPTURE - LATER
-    # def capture_screen():
-    #         sub = DRAWING_SURFACE.subsurface(DRAWING_SURFACE_RECT)
-    #         sub = screen
-    #         pygame.image.save(sub, Path(CURRENT_DIRECTORY, 'screenshot', 'screenshot.png'))
-
     def generate_asset(image_name, directory, file_name, x_coord=0, y_coord=0, scale=1, opacity=255):
         image_name = pygame.image.load(Path(directory, file_name)).convert_alpha()
         if scale != 1:
@@ -170,18 +164,17 @@ def main(skin_selected):
     font2 = pygame.font.SysFont('consolas', 21)
     # TO CHECK AVAILABLE FONTS
     # print(pygame.font.get_fonts())
-    
+    # FONT
     if skin_selected == 'classic':
         color_text = 'black'
     else:
         color_text = 'white'
-
     text_classic = font1.render('Classic', True, (color_text))
     text_minimal = font2.render('Minimal', True, (color_text))
-    
+    # RECT
     TEXT_CLASSIC_RECT = text_classic.get_rect()
     TEXT_MINIMAL_RECT = text_minimal.get_rect()
-    
+    # RECT POSITIONS
     TEXT_X_COORD = SCREEN_WIDTH - 5
     TEXT_Y_COORD = 40
     TEXT_CLASSIC_RECT.bottomright = (TEXT_X_COORD, TEXT_Y_COORD)
@@ -197,13 +190,6 @@ def main(skin_selected):
     while run:
         cursor_coord_x, cursor_coord_y = pygame.mouse.get_pos()
         # print(cursor_coord_x, cursor_coord_y)
-
-        ## SKIN UPDATE
-        if pygame.mouse.get_pressed()[0] == True:
-            if TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'classic':
-                main('classic')
-            if TEXT_MINIMAL_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'minimal':
-                main('minimal')
 
         # CURSOR OVER OBJECTS
         if a_shape_selected == False:
@@ -228,9 +214,6 @@ def main(skin_selected):
             else:
                 pygame.mouse.set_cursor()
         
-        # DRAWING
-        if a_shape_selected and pygame.mouse.get_pressed()[0] == True and DRAWING_SURFACE_RECT.collidepoint(event.pos):
-            DRAWING_SURFACE.blit(drawing_shape, (cursor_coord_x-drawing_corigation_x, cursor_coord_y-drawing_corigation_y))
 
         # EVENTS
         for event in pygame.event.get():
@@ -315,6 +298,10 @@ def main(skin_selected):
         # DISPLAY GRID ON THE DRAWING SURFACE
         DRAWING_SURFACE.blit(GRID, (0,0))
 
+        # DRAWING
+        if a_shape_selected and pygame.mouse.get_pressed()[0] == True and DRAWING_SURFACE_RECT.collidepoint(event.pos):
+            DRAWING_SURFACE.blit(drawing_shape, (cursor_coord_x-drawing_corigation_x, cursor_coord_y-drawing_corigation_y))
+
         # DISPLAY BACKGOUND
         screen.blit(BACKGROUND, (0,0))
 
@@ -336,7 +323,7 @@ def main(skin_selected):
         # SMALL RECT - INDICATION OF THE MENU
         pygame.draw.rect(screen, (color), [SCREEN_WIDTH - 10, 10, 10, 70])
 
-        # CHECKING THE CURSOR POSITION -> CURSOR IS  OVER = MENU IS DISPLAYED
+        # CHECKING THE CURSOR POSITION - CURSOR IS OVER -> SKIN SELECTION MENU IS DISPLAYED
         SKIN_TEXT_VISIBILE_RECT = pygame.Rect(SCREEN_WIDTH - 100, 0, 120, 70)
         if SKIN_TEXT_VISIBILE_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
             
@@ -346,6 +333,13 @@ def main(skin_selected):
             # TEXT / SKIN SELECTION
             screen.blit(text_classic, TEXT_CLASSIC_RECT)
             screen.blit(text_minimal, TEXT_MINIMAL_RECT)
+        
+        ## SKIN UPDATE
+        if pygame.mouse.get_pressed()[0] == True:
+            if TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'classic':
+                main('classic')
+            if TEXT_MINIMAL_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'minimal':
+                main('minimal')
 
         pygame.display.update()
         clock.tick(60)

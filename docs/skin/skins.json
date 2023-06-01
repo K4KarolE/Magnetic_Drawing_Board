@@ -32,8 +32,8 @@
         "interval":[160, 130]
         },
     "drawing_surface_rect": {
-        "coord":[171, 121],
-        "size": [900, 500]
+        "coord":[140, 100],
+        "size": [950, 550]
         }
     },
 "classic": {
@@ -69,8 +69,8 @@
         "interval":[180, 330]
         },
     "drawing_surface_rect": {
-        "coord":[196, 173],
-        "size": [676, 492]
+        "coord":[170, 160],
+        "size": [700, 520]
         }
     }
 }

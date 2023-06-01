@@ -9,7 +9,6 @@ if SKIN_TEXT_VISIBILE_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
 from pathlib import Path
 import os
 
-
 WORKING_DIRECTORY = os.path.dirname(__file__)
 SHAPES_DIRECTORY = Path(WORKING_DIRECTORY, 'docs', 'skin', 'shapes')
 
