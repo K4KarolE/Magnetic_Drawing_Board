@@ -16,8 +16,6 @@
 <br>
 
 
-https://github.com/K4KarolE/Magnetic_Drawing_Board/assets/89346643/edcac31d-4293-484d-80ed-5a1bb0089789.mp4
-
 
 # Requirements
 ## Python and Modules
