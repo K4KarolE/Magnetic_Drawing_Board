@@ -276,7 +276,7 @@ def main(skin_selected):
                 if ERASER_RECT.collidepoint(event.pos):
                     eraser_moving = True
                 
-            # MOUSEMOTION
+            # MOUSEMOTION - MOVE ERASER
             elif event.type == pygame.MOUSEMOTION and eraser_moving and a_shape_selected == False:
                 if object_dic['eraser_interval'][0] < cursor_coord_x < SCREEN_WIDTH - object_dic['eraser_interval'][1]:
                     # MOVE ERASER
