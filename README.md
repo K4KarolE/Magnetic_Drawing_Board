@@ -17,7 +17,11 @@
 
 
 
-https://github.com/K4KarolE/Magnetic_Drawing_Board/assets/89346643/688e2784-ea9e-40f3-9ffb-11854e831e07
+
+https://github.com/K4KarolE/Magnetic_Drawing_Board/assets/89346643/0f077c8e-b8e3-47d5-b930-7b66317accf2
+
+
+
 
 
 
