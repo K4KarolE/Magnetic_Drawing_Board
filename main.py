@@ -127,7 +127,7 @@ def main(skin_selected):
         }
 
     # GENERATE CURSOR / DRAWING IMAGES
-    OBJECT_RECT_LIST = []
+    SHAPES_RECT_LIST = []
     for shape in SHAPES.values():
         # CURSOR IMAGES
         if shape['image'] == PEN:
@@ -145,7 +145,7 @@ def main(skin_selected):
         # DRAWING IMAGES
         shape['drawing_image'] = generate_asset('DRAWING_IMAGE', DRAWING_DIRECTORY, shape['drawing_file'])[0]  # [0] - just the image no RECT
         # RECT LIST
-        OBJECT_RECT_LIST.append(shape['image_rect'])
+        SHAPES_RECT_LIST.append(shape['image_rect'])
 
 
     def rotate_images(shape, cursor_rotation):
@@ -194,16 +194,16 @@ def main(skin_selected):
         # CURSOR OVER OBJECTS
         if a_shape_selected == False:
             # CIRCLE
-            if OBJECT_RECT_LIST[0].collidepoint(cursor_coord_x, cursor_coord_y):
+            if SHAPES_RECT_LIST[0].collidepoint(cursor_coord_x, cursor_coord_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             # SQUARE
-            elif OBJECT_RECT_LIST[1].collidepoint(cursor_coord_x, cursor_coord_y):
+            elif SHAPES_RECT_LIST[1].collidepoint(cursor_coord_x, cursor_coord_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             # TRIANGLE
-            elif OBJECT_RECT_LIST[2].collidepoint(cursor_coord_x, cursor_coord_y):
+            elif SHAPES_RECT_LIST[2].collidepoint(cursor_coord_x, cursor_coord_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             # PEN
-            elif OBJECT_RECT_LIST[3].collidepoint(cursor_coord_x, cursor_coord_y):
+            elif SHAPES_RECT_LIST[3].collidepoint(cursor_coord_x, cursor_coord_y):
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             # ERASER
             elif ERASER_RECT.collidepoint(cursor_coord_x, cursor_coord_y):
@@ -234,15 +234,15 @@ def main(skin_selected):
                             drawing_shape = shape['drawing_image']
                             # DRAWING CORIGATION - CURSOR POSITION VS CURSOR IMAGE
                             if shape['image'] == PEN:
-                                drawing_corigation_x = 0 # + 5    # drawing in the top left of the PEN cursor image
-                                drawing_corigation_y = 0 #-shape['cursor_size'][1] + 10
+                                drawing_corigation_x = 0 # drawing in the bottom left of the PEN cursor image
+                                drawing_corigation_y = 0 
                             else:    
                                 drawing_corigation_x = int(shape['cursor_size'][0] / 2)     # drawing in middle of the cursor image
                                 drawing_corigation_y = int(shape['cursor_size'][1] / 2)
                         # DESELECT THE SHAPE
-                        elif shape['selected']:          # shape image not displayed = that is the selected one -> able to "put back"
+                        elif shape['selected']:     
                             a_shape_selected = False
-                            pygame.mouse.set_cursor()
+                            pygame.mouse.set_cursor()   # back to default cursor
                             shape['selected'] = False
                             drawing_shape = None
                             # BACK TO ORIGINAL, NON-ROTATED POSITION
