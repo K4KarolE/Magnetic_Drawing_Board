@@ -17,11 +17,7 @@
 
 
 
-
 https://github.com/K4KarolE/Magnetic_Drawing_Board/assets/89346643/0f077c8e-b8e3-47d5-b930-7b66317accf2
-
-
-
 
 
 
@@ -69,5 +65,6 @@ pip install -r requirements.txt
 - json
 - os
 - pathlib
+- sys
 
 ## Thank you all the contributors of Pygame and the modules listed in this document!

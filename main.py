@@ -4,6 +4,7 @@ import pygame
 from pathlib import Path
 import os
 import json
+import sys
 
 #SCREEN
 SCREEN_WIDTH = 1200
@@ -336,10 +337,12 @@ def main(skin_selected):
         
         ## SKIN UPDATE
         if pygame.mouse.get_pressed()[0] == True:
-            if TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'classic':
-                main('classic')
             if TEXT_MINIMAL_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'minimal':
                 main('minimal')
+                sys.exit()  # to avoid dropping an error message once the app closed: "pygame.display.update() pygame.error: video system not initialized"
+            if TEXT_CLASSIC_RECT.collidepoint(cursor_coord_x, cursor_coord_y) and skin_selected != 'classic':
+                main('classic')
+                sys.exit()
 
         pygame.display.update()
         clock.tick(60)
