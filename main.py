@@ -59,13 +59,13 @@ def main(skin_selected):
     DRAWING_SURFACE_RECT = pygame.Rect((object_dic['drawing_surface_rect_coord'][0], object_dic['drawing_surface_rect_coord'][1]), (object_dic['drawing_surface_rect_size'][0], object_dic['drawing_surface_rect_size'][1]))  # Rect(left, top, width, height)
 
     # GRID
-    GRID = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255)
+    GRID = generate_asset('GRID', BACKGROUND_DIRECTORY, 'grid.png', 0, 0, 4, 6)[0] # coord, coord, scale, opacity(0-255)
 
     # BACKGROUND IMAGE
     BACKGROUND = generate_asset('BACKGROUND_IMAGE', BACKGROUND_DIRECTORY, 'background.png')[0]
 
     # ERASER
-    ERASER, ERASER_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'eraser.png', object_dic['eraser_coord'][0], object_dic['eraser_coord'][1])
+    ERASER, ERASER_RECT = generate_asset('ERASER', OBJECTS_DIRECTORY, 'eraser.png', object_dic['eraser_coord'][0], object_dic['eraser_coord'][1])
 
     # CIRCLE
     CIRCLE, CIRCLE_RECT = generate_asset('CIRCLE', OBJECTS_DIRECTORY, 'circle.png', object_dic['circle_coord'][0], object_dic['circle_coord'][1])
@@ -74,7 +74,7 @@ def main(skin_selected):
     SQUARE, SQUARE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'square.png', object_dic['square_coord'][0], object_dic['square_coord'][1])
     
     # TRIANGLE
-    TRIANGLE, TRIANGLE_RECT = generate_asset('SQUARE', OBJECTS_DIRECTORY, 'triangle.png', object_dic['triangle_coord'][0], object_dic['triangle_coord'][1])
+    TRIANGLE, TRIANGLE_RECT = generate_asset('TRIANGLE', OBJECTS_DIRECTORY, 'triangle.png', object_dic['triangle_coord'][0], object_dic['triangle_coord'][1])
     
     # PEN
     PEN, PEN_RECT = generate_asset('PEN', OBJECTS_DIRECTORY, 'pen.png', object_dic['pen_coord'][0],  object_dic['pen_coord'][1], object_dic['pen_scale'])
@@ -273,17 +273,26 @@ def main(skin_selected):
                             drawing_corigation_y = int(shape['cursor_size'][1] / 2)
                             pygame.mouse.set_cursor(shape['cursor'])
                         
-                # ERASER          
+                # ERASER        
                 if ERASER_RECT.collidepoint(event.pos):
                     eraser_moving = True
-                
+    
+                 
             # MOUSEMOTION - MOVE ERASER
-            elif event.type == pygame.MOUSEMOTION and eraser_moving and a_shape_selected == False:
-                if object_dic['eraser_interval'][0] < cursor_coord_x < SCREEN_WIDTH - object_dic['eraser_interval'][1]:
+            elif event.type == pygame.MOUSEMOTION:
+                # ERASER_RECT[0] = x coord,  ERASER_RECT[3] = rect x size, event.rel[0] = the relative x coord position change
+                eraser_future_position = ERASER_RECT[0] + event.rel[0]
+                if not object_dic['eraser_interval'][0] - ERASER_RECT[3]/2 < eraser_future_position < object_dic['eraser_interval'][1] - ERASER_RECT[3]/2:
+                    eraser_moving = False
+                elif eraser_moving and a_shape_selected == False:
                     # MOVE ERASER
                     ERASER_RECT.move_ip(event.rel[0], 0)    # no vertical movement allowed
                     # DRAW RECT./ERASE SURFACE
-                    pygame.draw.rect(DRAWING_SURFACE, ('White'), [cursor_coord_x-20, 120, 50, 550], 0)
+                    # The eraser picture size is smaller than it`s rect
+                    # To make sure the eraser beam/rectangular will be aligned in the middle of the eraser picture:
+                    drawing_x_position = ERASER_RECT[0] + ERASER_RECT[3]/2 - object_dic['eraser_size']/2
+                    pygame.draw.rect(DRAWING_SURFACE, ('White'), [drawing_x_position, 120, object_dic['eraser_size'], 550], 0)
+    
 
             # MOUSEBUTTONUP
             elif event.type == pygame.MOUSEBUTTONUP:

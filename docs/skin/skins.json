@@ -27,9 +27,10 @@
         },
     "eraser": {
         "coord":[160, 680],
+        "size": 25,
         "scale": 3,
         "opacity": 255,
-        "interval":[160, 130]
+        "interval":[160, 1070]
         },
     "drawing_surface_rect": {
         "coord":[140, 100],
@@ -64,9 +65,10 @@
         },
     "eraser": {
         "coord":[180, 723],
+        "size": 60,
         "scale": 3,
         "opacity": 255,
-        "interval":[180, 330]
+        "interval":[180, 870]
         },
     "drawing_surface_rect": {
         "coord":[170, 160],
