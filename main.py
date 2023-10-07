@@ -2,7 +2,6 @@
 
 import pygame
 from pathlib import Path
-import os
 import json
 import sys
 
@@ -11,13 +10,13 @@ SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 
 # LOADING DATA
-f = open(Path(os.path.dirname(__file__), 'docs', 'skin', 'skins.json'))
+CURRENT_DIRECTORY = Path().resolve()
+f = open(Path(CURRENT_DIRECTORY, 'docs', 'skin', 'skins.json'))
 SKINS = json.load(f)
   
 
 def main(skin_selected):
     # PATHS
-    CURRENT_DIRECTORY = os.path.dirname(__file__)
     WORKING_DIRECTORY = Path(CURRENT_DIRECTORY, 'docs', 'skin', skin_selected)
     DRAWING_DIRECTORY = Path(WORKING_DIRECTORY, 'drawing')
     OBJECTS_DIRECTORY = Path(WORKING_DIRECTORY, 'objects')
