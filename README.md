@@ -20,6 +20,12 @@
 https://github.com/K4KarolE/Magnetic_Drawing_Board/assets/89346643/0f077c8e-b8e3-47d5-b930-7b66317accf2
 
 
+# Source used ([link](https://www.amazon.com.au/WELHAEPI-Children-Magnetic-Educational-Learning/dp/B0991P61JX?th=1))
+<div align="center">
+    <img src="docs/promo/source_pic.png"</img> 
+</div>
+<br>
+
 
 # Requirements
 ## Python and Modules
